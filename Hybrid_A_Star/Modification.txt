@@ -1,0 +1,25 @@
+1.重新写了地图发布节点map_publish.cpp,用于生成nav_msgs::OccupancyGrid类型的地图并在rviz中显示。
+
+2.添加不同种类的地图用于测试不同环境下的效果
+
+3.修改车辆相关参数，用于匹配实际中的小车
+    将urdf文件中的车辆尺寸缩放由1.1改为0.5
+    将车辆参数中的wheel_base由2.0改为1.0
+    PublishVehiclePath(path, 4.0, 2.0, 5u)改为PublishVehiclePath(path, 2.0, 1.0, 3u);
+    SetVehicleShape(4.7, 2.0, 1.3)改为SetVehicleShape(2.1, 1.0, 0.6);
+
+4.修改RS曲线为Dubins曲线
+
+5.尝试使用雷达障碍物点来构建地图，来检测和生成路径
+
+
+###自动泊车
+直接使用hybrid A*原始路径，修改PublishVehiclePath和for (const auto &pose: cubic_path)内的路径。
+修改移动频率为ros::Duration(0.1).sleep();
+
+由于hybrid A*只能在原点为(0.0, 0.0)的地图中使用，所以要计算偏移量x_offset, y_offset; 将地图平移到(0.0, 0.0)点。
+地图上标注的起点和终点也要对应偏移。
+计算出路径后，再将路径偏移到原来的地图中。
+ESDF地图的初始化原点不受限制，所以可以直接对计算出的路径优化，也可以偏移后再优化，注意地图范围对齐即可。
+
+
